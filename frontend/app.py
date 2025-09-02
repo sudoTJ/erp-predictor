@@ -48,7 +48,7 @@ def main():
     with col2:
         # Generate prediction button
         if st.button("🔮 Generate Prediction", type="primary", use_container_width=True):
-            with st.spinner("🔍 Analyzing data and generating predictions..."):
+            with st.spinner("🤖 Generating AI-powered business insights... Please wait for DGPT analysis"):
                 result = api_client.make_prediction(
                     prediction_type=prediction_type,
                     entity_id=entity_id, 

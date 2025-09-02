@@ -83,11 +83,12 @@ This system looks at your past business data and uses machine learning algorithm
 - 50% confidence = Could go either way, monitor closely
 - Predictions get less confident the further into the future they go
 
-**5. 💡 Smart Recommendations**
-- The system doesn't just predict, it gives advice:
+**5. 💡 AI-Powered Smart Recommendations**
+- The system uses DGPT AI to generate contextual business advice:
 - "Order 50 more laptops by Friday to avoid stockout"
-- "Reduce marketing spend by $10K this month to stay on budget"
+- "Reduce marketing spend by $10K this month to stay on budget" 
 - "Start interviewing developers now for Q2 hiring"
+- Enhanced with real-time AI analysis for nuanced, actionable insights
 
 ### Real Example in Action
 
@@ -163,6 +164,51 @@ ERP Database → Feature Engineering → ML Model → Confidence Calculation →
 - **Memory Usage**: <512MB per service
 - **Accuracy**: 70-85% for 30-day predictions (varies by domain)
 - **Scalability**: Handles 10+ concurrent prediction requests
+
+## 🤖 **DGPT AI Integration**
+
+### **Enhanced Business Insights with AI**
+
+The system now features **DGPT AI integration** for generating sophisticated, contextual business insights that go far beyond static rule-based recommendations.
+
+**🎯 How It Works:**
+1. **ML Predictions Generated** - Linear regression creates numerical forecasts
+2. **AI Analysis** - DGPT analyzes predictions with business context 
+3. **Smart Insights** - AI generates actionable, domain-specific recommendations
+4. **Fallback Protection** - Static insights used if AI unavailable
+
+**💡 AI-Powered vs Static Insights:**
+
+| **Static (Old)** | **AI-Powered (New)** |
+|------------------|----------------------|
+| "Demand expected to remain stable" | "Based on seasonal patterns and current inventory turnover, maintain current stock levels but prepare for 15% demand increase in Q2 due to product lifecycle trends" |
+| "Budget spending on track" | "Marketing spend is tracking 8% below budget with strong ROI on digital channels - consider reallocating $15K from traditional to digital marketing for optimal performance" |
+| "Resource utilization stable" | "Engineering team operating at 78% capacity with upcoming project deadlines - recommend hiring 2 senior developers by month-end to maintain delivery commitments and prevent burnout" |
+
+### **🔧 DGPT Configuration**
+
+**Environment Variables:**
+```bash
+# Required for DGPT integration
+DELA_API_KEY=your_api_key_here
+DGPT_CUSTOMER_ID=your_customer_id  
+DGPT_USER_ID=your_user_id
+
+# Optional configuration
+DGPT_ENABLED=true  # Set to false to disable AI insights
+DGPT_REQUEST_TIMEOUT=30.0  # API timeout in seconds
+```
+
+**Setup Steps:**
+1. Copy `.env.dgpt.example` to `.env`
+2. Configure your DGPT API credentials
+3. Set `DGPT_ENABLED=true` to activate AI insights
+4. System automatically falls back to static insights if AI fails
+
+**🛡️ Fallback Strategy:**
+- **Primary:** DGPT AI-generated insights (contextual, sophisticated)
+- **Fallback:** Static rule-based insights (reliable, fast)
+- **Graceful degradation:** No system failures if AI unavailable
 
 ## 🚀 Quick Start Guide
 

@@ -46,11 +46,26 @@ class PredictionEngine:
             # Generate predictions
             predictions = self._create_predictions(df, prediction_type, time_horizon)
             
-            # Generate insights
-            insights = self.insight_generator.generate_insights(predictions, prediction_type, df)
-            
-            # Create metadata
+            # Create metadata first (needed for insights)
             metadata = self._create_metadata(df, predictions)
+            
+            # Prepare enhanced prediction data for AI insights
+            prediction_data = {
+                "prediction_type": prediction_type,
+                "entity_id": entity_id,
+                "time_horizon": time_horizon,
+                "predictions": [p.dict() for p in predictions],
+                "metadata": metadata
+            }
+            
+            # Generate enhanced insights with DGPT + fallback
+            insights = await self.insight_generator.generate_insights(
+                predictions, 
+                prediction_type, 
+                historical_df=df,
+                entity_id=entity_id,
+                prediction_data=prediction_data
+            )
             
             return {
                 "prediction_type": prediction_type,

@@ -15,7 +15,7 @@ class APIClient:
     def __init__(self):
         self.prediction_url = config.PREDICTION_API_URL
         self.erp_url = config.ERP_API_URL
-        self.timeout = 30
+        self.timeout = 60  # Increased for DGPT AI processing
     
     def make_prediction(self, prediction_type: str, entity_id: str, 
                        time_horizon: int, context: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
@@ -42,7 +42,7 @@ class APIClient:
                 return None
                 
         except requests.exceptions.Timeout:
-            st.error("Request timed out. The prediction service may be busy.")
+            st.error("AI insights generation timed out. DGPT may be busy - please try again.")
             return None
         except requests.exceptions.ConnectionError:
             st.error("Unable to connect to prediction service. Please check if the service is running.")

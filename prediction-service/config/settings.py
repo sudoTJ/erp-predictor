@@ -24,6 +24,13 @@ class Config:
     # Confidence Settings
     BASE_CONFIDENCE = 0.8
     CONFIDENCE_DECAY = 0.01
+    
+    # DGPT API Settings
+    DELA_API_KEY = os.getenv('DELA_API_KEY', '')
+    DGPT_CUSTOMER_ID = os.getenv('DGPT_CUSTOMER_ID', 'default_customer')
+    DGPT_USER_ID = os.getenv('DGPT_USER_ID', 'default_user')
+    DGPT_ENABLED = os.getenv('DGPT_ENABLED', 'true').lower() == 'true'
+    DGPT_REQUEST_TIMEOUT = float(os.getenv('DGPT_REQUEST_TIMEOUT', '30.0'))
 
 class DevelopmentConfig(Config):
     """Development configuration"""
