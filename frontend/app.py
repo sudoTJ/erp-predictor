@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 def main():
     """Main application function"""
     
-    # Header
-    st.title("🚀 ERP Prediction Dashboard")
-    st.markdown("**AI-powered business intelligence for your ERP system**")
+    # Header - Business-focused title
+    st.title("📊 Smart Business Forecasting")
+    st.markdown("**Get instant predictions to prevent stockouts, budget overruns, and resource shortages**")
     
     # Sidebar for parameters
     prediction_type, entity_id, time_horizon = render_prediction_sidebar()
@@ -73,19 +73,68 @@ def main():
         display_welcome_content()
 
 def display_prediction_results(result):
-    """Display prediction results with charts and insights"""
+    """Display prediction results with business insights prioritized first"""
     predictions = result.get('predictions', [])
     insights = result.get('insights', [])
     metadata = result.get('metadata', {})
     prediction_type = result.get('prediction_type', '')
     entity_id = result.get('entity_id', '')
     
-    # Key metrics at the top
-    st.markdown("## 📊 Key Metrics")
-    display_key_metrics(predictions, prediction_type, metadata)
+    # === BUSINESS INSIGHTS FIRST (Most Important) ===
+    st.markdown("## 🎯 **What This Means for Your Business**")
     
-    # Main prediction chart
-    st.markdown("## 📈 Prediction Forecast")
+    # Create prominent insights display
+    insight_col1, insight_col2 = st.columns([2, 1])
+    
+    with insight_col1:
+        # Primary business insights - highly visible
+        if insights:
+            st.markdown("### 💡 **Key Insights & Recommendations**")
+            for i, insight in enumerate(insights, 1):
+                insight_lower = insight.lower()
+                
+                # URGENT ACTION - Only for critical problems
+                if any(phrase in insight_lower for phrase in [
+                    'reorder recommended', 'will run out', 'stockout', 'running low', 
+                    'urgent reorder', 'immediate action', 'critical stock level'
+                ]):
+                    st.error(f"🚨 **URGENT ACTION:** {insight}")
+                
+                # BUDGET ALERT - Only for spending issues
+                elif any(phrase in insight_lower for phrase in [
+                    'over budget', 'exceed budget', 'budget exceeded', 'overspending',
+                    'budget variance', 'spending too much', 'budget alert'
+                ]):
+                    st.warning(f"⚠️ **BUDGET ALERT:** {insight}")
+                
+                # GOOD NEWS - Positive situations
+                elif any(phrase in insight_lower for phrase in [
+                    'adequate', 'stable', 'good', 'healthy', 'sufficient', 
+                    'on track', 'within budget', 'performing well'
+                ]):
+                    st.success(f"✅ **GOOD NEWS:** {insight}")
+                
+                # WARNING - Moderate concerns
+                elif any(phrase in insight_lower for phrase in [
+                    'monitor closely', 'watch', 'attention needed', 'declining',
+                    'trending down', 'consider', 'may need'
+                ]):
+                    st.warning(f"⚠️ **MONITOR:** {insight}")
+                
+                # DEFAULT - General insights
+                else:
+                    st.info(f"📋 **INSIGHT {i}:** {insight}")
+        else:
+            st.info("🔍 Analyzing patterns... insights will appear here")
+    
+    with insight_col2:
+        # Quick action summary
+        display_action_recommendations(predictions, prediction_type, insights)
+    
+    st.markdown("---")  # Visual separator
+    
+    # === MAIN PREDICTION CHART (Right after insights) ===
+    st.markdown("## 📈 **Prediction Forecast**")
     
     chart_col, info_col = st.columns([3, 1])
     
@@ -93,6 +142,7 @@ def display_prediction_results(result):
         if predictions:
             fig = create_prediction_chart(predictions, prediction_type)
             st.plotly_chart(fig, use_container_width=True)
+            st.caption("💡 *Hover over the chart for detailed values and dates*")
         else:
             st.error("No prediction data available")
     
@@ -103,37 +153,43 @@ def display_prediction_results(result):
         # Risk indicators
         display_risk_indicators(predictions, prediction_type)
     
-    # Secondary charts
-    if predictions:
-        chart_col1, chart_col2 = st.columns(2)
-        
-        with chart_col1:
-            confidence_fig = create_confidence_chart(predictions)
-            st.plotly_chart(confidence_fig, use_container_width=True)
-        
-        with chart_col2:
-            if len(predictions) > 7:
-                trend_fig = create_trend_analysis_chart(predictions)
-                st.plotly_chart(trend_fig, use_container_width=True)
-            else:
-                summary_fig = create_summary_metrics_chart(predictions, prediction_type)
-                st.plotly_chart(summary_fig, use_container_width=True)
+    # === DETAILED ANALYSIS (EXPANDABLE SECTIONS) ===
+    st.markdown("---")
+    st.markdown("## 📊 **Additional Analysis** *(Click sections below to explore)*")
     
-    # Insights and recommendations
-    col1, col2 = st.columns([1, 1])
+    # Key metrics - now in expandable section
+    with st.expander("📊 **Key Summary Metrics**", expanded=False):
+        display_key_metrics(predictions, prediction_type, metadata)
     
-    with col1:
-        display_insights_panel(insights)
-        
-    with col2:
-        display_action_recommendations(predictions, prediction_type, insights)
+    # Secondary analysis charts
+    with st.expander("📊 **Advanced Analytics & Confidence Analysis**", expanded=False):
+        if predictions:
+            chart_col1, chart_col2 = st.columns(2)
+            
+            with chart_col1:
+                st.markdown("**Confidence Over Time**")
+                confidence_fig = create_confidence_chart(predictions)
+                st.plotly_chart(confidence_fig, use_container_width=True)
+            
+            with chart_col2:
+                if len(predictions) > 7:
+                    st.markdown("**Trend Analysis**")
+                    trend_fig = create_trend_analysis_chart(predictions)
+                    st.plotly_chart(trend_fig, use_container_width=True)
+                else:
+                    st.markdown("**Summary Metrics**")
+                    summary_fig = create_summary_metrics_chart(predictions, prediction_type)
+                    st.plotly_chart(summary_fig, use_container_width=True)
+        else:
+            st.info("Generate a prediction to see advanced analytics")
     
-    # Detailed data section
-    with st.expander("📋 Detailed Prediction Data", expanded=False):
+    # Raw data table - least priority
+    with st.expander("📋 **Raw Data & Export** *(For detailed analysis)*", expanded=False):
         col1, col2 = st.columns([2, 1])
         
         with col1:
             if predictions:
+                st.markdown("**Daily Predictions Table**")
                 df = format_predictions_for_display(predictions)
                 st.dataframe(df, use_container_width=True)
                 
@@ -145,45 +201,100 @@ def display_prediction_results(result):
                     file_name=f"{prediction_type}_{entity_id}_forecast_{datetime.now().strftime('%Y%m%d')}.csv",
                     mime="text/csv"
                 )
+            else:
+                st.info("No data to display")
         
         with col2:
+            st.markdown("**Prediction Summary**")
             display_prediction_summary(predictions, prediction_type)
 
 def display_welcome_content():
     """Display welcome content when no predictions are shown"""
-    st.markdown("## 🎯 Welcome to the ERP Prediction System")
+    st.markdown("## 🎯 **Turn Your Business Data Into Smart Decisions**")
     
-    st.markdown("""
-    This dashboard provides AI-powered predictions for your ERP data across multiple business domains:
+    # Prominent call-to-action box
+    st.info("👈 **Select a prediction type from the sidebar to get started** - Get actionable insights in under 2 seconds!")
     
-    ### 📦 **Inventory Forecasting**
-    - Predict product demand trends
-    - Optimize stock levels and reduce holding costs
-    - Avoid stockouts and overstock situations
+    st.markdown("---")
     
-    ### 💰 **Budget Analysis** 
-    - Forecast department spending patterns
-    - Identify budget variances early
-    - Enable proactive budget management
+    # Business value proposition first
+    st.markdown("### 💼 **Stop Guessing, Start Predicting**")
     
-    ### 👥 **Resource Planning**
-    - Predict team utilization rates
-    - Plan capacity and hiring needs
-    - Optimize resource allocation
+    value_col1, value_col2 = st.columns(2)
     
-    ### 📈 **Sales Forecasting**
-    - Forecast revenue trends
-    - Identify growth opportunities
-    - Support strategic planning
+    with value_col1:
+        st.markdown("""
+        **🚨 Problems This Solves:**
+        - Running out of popular products
+        - Budget overruns discovered too late  
+        - Teams overworked or underutilized
+        - Missing revenue opportunities
+        """)
     
-    ---
+    with value_col2:
+        st.markdown("""
+        **✅ Business Benefits:**
+        - Prevent costly stockouts & overstock
+        - Control spending before budget deadlines
+        - Plan workforce needs in advance
+        - Make data-driven strategic decisions
+        """)
     
-    **🚀 Quick Start:**
-    1. Select a prediction type from the sidebar
-    2. Choose the entity you want to analyze  
-    3. Set your forecast horizon
-    4. Click "Generate Prediction"
-    """)
+    st.markdown("---")
+    
+    # What we predict - business focused
+    st.markdown("### 🎯 **What We Predict For You**")
+    
+    pred_col1, pred_col2 = st.columns(2)
+    
+    with pred_col1:
+        st.markdown("""
+        **📦 Inventory Intelligence**
+        - *"Will I run out of laptops next week?"*
+        - Get reorder alerts before stockouts
+        
+        **💰 Budget Control**
+        - *"Is Marketing about to exceed budget?"*
+        - Early warning for overspending
+        """)
+    
+    with pred_col2:
+        st.markdown("""
+        **👥 Workforce Planning** 
+        - *"Do I need to hire more engineers?"*
+        - Optimize team capacity & costs
+        
+        **📈 Revenue Forecasting**
+        - *"What's our sales trajectory?"*
+        - Spot growth opportunities early
+        """)
+    
+    st.markdown("---")
+    
+    # Quick start - action oriented
+    st.markdown("### 🚀 **3 Simple Steps to Smart Insights**")
+    
+    step_col1, step_col2, step_col3 = st.columns(3)
+    
+    with step_col1:
+        st.markdown("""
+        **1️⃣ Choose What to Predict**
+        Select inventory, budget, workforce, or sales from the sidebar
+        """)
+    
+    with step_col2:
+        st.markdown("""
+        **2️⃣ Pick Your Focus**
+        Choose the product, department, or team you want to analyze
+        """)
+    
+    with step_col3:
+        st.markdown("""
+        **3️⃣ Get Instant Insights**
+        Click "Generate Prediction" for actionable recommendations
+        """)
+    
+    st.markdown("---")
     
     # Demo metrics
     col1, col2, col3, col4 = st.columns(4)

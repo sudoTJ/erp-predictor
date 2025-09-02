@@ -5,12 +5,6 @@ from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
-ApiDoc(
-    app,
-    title="Sample App",
-    version="1.0.0",
-    description="A simple app API",
-)
 DATABASE = "../erp_demo.db"
 
 def get_db_connection():

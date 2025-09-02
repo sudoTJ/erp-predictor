@@ -9,8 +9,8 @@ class Config:
     ERP_API_URL = "http://localhost:3001/api/v1"
     
     # Streamlit settings
-    PAGE_TITLE = "ERP Prediction Dashboard"
-    PAGE_ICON = ":bar_chart:"
+    PAGE_TITLE = "Smart Business Forecasting"
+    PAGE_ICON = ":chart_with_upwards_trend:"
     LAYOUT = "wide"
     
     # UI settings
