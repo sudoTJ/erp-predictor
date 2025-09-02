@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: erp_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./erp-service/sql/:/docker-entrypoint-initdb.d/
+
+  erp-service:
+    build: ./erp-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_NAME: erp_db
+      DB_USER: postgres
+      DB_PASSWORD: password
+
+  prediction-service:
+    build: ./prediction-service
+    ports:
+      - "3002:3002"
+    environment:
+      ERP_SERVICE_URL: http://erp-service:3001/api/v1
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      PREDICTION_API_URL: http://prediction-service:3002/api/v1
+
+volumes:
+  postgres_data:
